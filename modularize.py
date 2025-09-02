@@ -206,3 +206,50 @@ print(adunni_account.deposit(25000))
 print(adunni_account.withdraw(10000))  
 print(adunni_account.transfer(15000, "Sunday James"))  
 print(adunni_account.check_balance())   
+
+### Encapsulation
+class NigerianBankAccount:
+    def __init__(self, owner, initial_balance=0):
+        self.owner = owner
+        self._balance = initial_balance        # Protected attribute
+        self.__pin = "1234"                   # Private attribute
+        self._transaction_history = []        # Protected attribute
+    
+    # Public methods - anyone can use these
+    def deposit(self, amount):
+        if amount > 0:
+            self._balance += amount
+            self._transaction_history.append(f"Deposited ₦{amount:,}")
+            return f"₦{amount:,} deposited successfully"
+        return "Invalid deposit amount"
+    
+    def withdraw(self, amount, pin):
+        if self.__verify_pin(pin):  # Uses private method
+            if amount <= self._balance:
+                self._balance -= amount
+                self._transaction_history.append(f"Withdrew ₦{amount:,}")
+                return f"₦{amount:,} withdrawn successfully"
+            return "Insufficient funds"
+        return "Invalid PIN"
+    
+    def check_balance(self, pin):
+        if self.__verify_pin(pin):
+            return f"Current balance: ₦{self._balance:,}"
+        return "Invalid PIN"
+    
+    # Private method - only the class can use this
+    def __verify_pin(self, entered_pin):
+        return entered_pin == self.__pin
+    
+    # Protected method - subclasses can use this
+    def _get_transaction_history(self):
+        return self._transaction_history.copy()
+    
+
+    # Using the encapsulated account
+ibrahim_account = NigerianBankAccount("Ibrahim Orekunrin", 50000)
+
+# These work - public interface
+print(ibrahim_account.deposit(10000))      # ₦10,000 deposited successfully
+print(ibrahim_account.withdraw(5000, "1234"))  # ₦5,000 withdrawn successfully
+print(ibrahim_account.check_balance("1234"))   # Current balance: ₦55,000
